@@ -4,10 +4,10 @@ import greenfoot.Greenfoot;
 import greenfoot.GreenfootImage;
 
 public class Enemy extends Actor {
-    private int hp = 3;
-    private int attackCooldown = 0;
-    private double px, py;
-    private final boolean ranged;
+    protected int hp = 3;
+    protected int attackCooldown = 0;
+    protected double px, py;
+    protected final boolean ranged;
 
     public Enemy() {
         this(false);
@@ -76,13 +76,29 @@ public class Enemy extends Actor {
         }
 
         if (hp <= 0) {
-            MyWorld world = (MyWorld) getWorld();
-            Player p = world.getPlayer();
-            if (p != null) {
-                p.onEnemyKilled(5);
-            }
-            world.removeObject(this);
-            world.notifyHit();
+            die();
+        }
+    }
+
+    /** Награда за убийство, выпадение бонуса и удаление актёра. Босс переопределяет. */
+    protected void die() {
+        MyWorld world = (MyWorld) getWorld();
+        if (world == null) {
+            return;
+        }
+        Player p = world.getPlayer();
+        if (p != null) {
+            p.onEnemyKilled(5);
+        }
+        maybeDropPickup(world, 14);
+        world.removeObject(this);
+        world.notifyHit();
+    }
+
+    /** С шансом chancePercent роняет случайный бонус на месте смерти. */
+    protected void maybeDropPickup(MyWorld world, int chancePercent) {
+        if (Greenfoot.getRandomNumber(100) < chancePercent) {
+            world.addObject(new Pickup(Pickup.randomKind()), getX(), getY());
         }
     }
 

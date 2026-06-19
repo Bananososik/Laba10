@@ -10,8 +10,8 @@
 - [x] Continuous enemy spawning
 
 ## If there is time
-- [ ] Dropable buffs
-- [ ] One simple boss
+- [x] Dropable buffs
+- [x] One simple boss
 - [ ] Sound effects
 - [ ] Better room variety
 - [ ] Proper art replacement for the placeholders
@@ -23,5 +23,5 @@
 - [x] Start with a playable prototype
 - [x] Add level-up menu with random choices
 - [x] Add chaser + ranged enemies
-- [ ] Add pickups and one mini-boss
-- [ ] Tune balance after wall/UI asset migration
+- [x] Add pickups and one mini-boss
+- [ ] Tune balance

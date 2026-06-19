@@ -635,6 +635,23 @@ public class Player extends Actor {
         return shieldTicks > 0;
     }
 
+    public void heal(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+        hp = Math.min(maxHp, hp + amount);
+        if (getWorld() != null) {
+            ((MyWorld) getWorld()).notifyHit();
+        }
+    }
+
+    public void grantShield(int ticks) {
+        shieldTicks = Math.max(shieldTicks, ticks);
+        if (getWorld() != null) {
+            ((MyWorld) getWorld()).notifyHit();
+        }
+    }
+
     public int getActiveSlotCount() {
         return activeOwned.size();
     }

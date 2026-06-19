@@ -231,6 +231,94 @@ public final class SpriteFactory {
         return image;
     }
 
+    public static GreenfootImage createBossSprite(int size) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(new Color(0, 0, 0, 0));
+        image.clear();
+
+        int cx = size / 2;
+        int cy = size / 2;
+
+        // menacing outer glow
+        image.setColor(new Color(255, 70, 40, 60));
+        image.fillOval(0, 0, size, size);
+        // armored shell
+        image.setColor(new Color(70, 20, 30));
+        image.fillOval(size / 10, size / 10, size - size / 5, size - size / 5);
+        image.setColor(new Color(140, 30, 40));
+        image.fillOval(size / 6, size / 6, size - size / 3, size - size / 3);
+        // plating ridges
+        image.setColor(new Color(40, 12, 18));
+        for (int i = 0; i < 8; i++) {
+            double a = Math.PI * 2 * i / 8.0;
+            int x1 = (int) Math.round(cx + Math.cos(a) * size / 6.0);
+            int y1 = (int) Math.round(cy + Math.sin(a) * size / 6.0);
+            int x2 = (int) Math.round(cx + Math.cos(a) * size / 2.4);
+            int y2 = (int) Math.round(cy + Math.sin(a) * size / 2.4);
+            image.drawLine(x1, y1, x2, y2);
+        }
+        // glowing core eye
+        image.setColor(new Color(255, 220, 120));
+        image.fillOval(cx - size / 8, cy - size / 8, size / 4, size / 4);
+        image.setColor(new Color(255, 255, 255, 200));
+        image.fillOval(cx - size / 16, cy - size / 16, size / 8, size / 8);
+        // spikes
+        image.setColor(new Color(200, 60, 70));
+        for (int i = 0; i < 4; i++) {
+            double a = Math.PI / 4 + Math.PI / 2 * i;
+            int sx = (int) Math.round(cx + Math.cos(a) * size / 2.2);
+            int sy = (int) Math.round(cy + Math.sin(a) * size / 2.2);
+            int tx = (int) Math.round(cx + Math.cos(a) * size / 1.9);
+            int ty = (int) Math.round(cy + Math.sin(a) * size / 1.9);
+            image.drawLine(sx, sy, tx, ty);
+        }
+        return image;
+    }
+
+    public static GreenfootImage createPickupSprite(int size, String kind) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(new Color(0, 0, 0, 0));
+        image.clear();
+
+        int cx = size / 2;
+        int cy = size / 2;
+        Color glow;
+        Color core;
+        if ("shield".equals(kind)) {
+            glow = new Color(90, 170, 255, 90);
+            core = new Color(120, 200, 255);
+        } else if ("xp".equals(kind)) {
+            glow = new Color(180, 120, 255, 90);
+            core = new Color(200, 150, 255);
+        } else { // heal
+            glow = new Color(80, 230, 120, 90);
+            core = new Color(120, 240, 150);
+        }
+
+        image.setColor(glow);
+        image.fillOval(0, 0, size, size);
+        image.setColor(core);
+        image.fillOval(size / 5, size / 5, size - 2 * size / 5, size - 2 * size / 5);
+        image.setColor(new Color(255, 255, 255, 230));
+
+        if ("shield".equals(kind)) {
+            // small shield arc icon
+            image.drawOval(cx - size / 5, cy - size / 5, 2 * size / 5, 2 * size / 5);
+            image.drawLine(cx, cy - size / 5, cx, cy + size / 5);
+        } else if ("xp".equals(kind)) {
+            // star-ish burst
+            image.drawLine(cx, cy - size / 4, cx, cy + size / 4);
+            image.drawLine(cx - size / 4, cy, cx + size / 4, cy);
+            image.drawLine(cx - size / 6, cy - size / 6, cx + size / 6, cy + size / 6);
+            image.drawLine(cx - size / 6, cy + size / 6, cx + size / 6, cy - size / 6);
+        } else {
+            // plus / cross for heal
+            image.fillRect(cx - size / 12, cy - size / 4, size / 6, size / 2);
+            image.fillRect(cx - size / 4, cy - size / 12, size / 2, size / 6);
+        }
+        return image;
+    }
+
     public static GreenfootImage createAlienEnemySprite(int size, boolean ranged) {
         GreenfootImage image = new GreenfootImage(size, size);
         image.setColor(new Color(0, 0, 0, 0));
