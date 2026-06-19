@@ -1,4 +1,5 @@
 import greenfoot.Color;
+import greenfoot.Greenfoot;
 import greenfoot.GreenfootImage;
 
 public final class SpriteFactory {
@@ -85,5 +86,185 @@ public final class SpriteFactory {
         } catch (Throwable t) {
             return null;
         }
+    }
+
+    public static GreenfootImage createSpaceBackground(int width, int height, int starCount) {
+        GreenfootImage background = new GreenfootImage(width, height);
+        for (int y = 0; y < height; y++) {
+            int blend = (int) Math.round(16 + (y / (double) Math.max(1, height)) * 20);
+            background.setColor(new Color(6 + blend / 4, 8 + blend / 5, 16 + blend));
+            background.drawLine(0, y, width, y);
+        }
+
+        background.setColor(new Color(80, 40, 120, 35));
+        background.fillOval(width - width / 4, -height / 6, width / 2, height / 2);
+        background.setColor(new Color(30, 90, 180, 28));
+        background.fillOval(-width / 8, height / 2, width / 3, height / 2);
+
+        background.setColor(new Color(255, 255, 255));
+        for (int i = 0; i < starCount; i++) {
+            int x = Greenfoot.getRandomNumber(width);
+            int y = Greenfoot.getRandomNumber(height);
+            int size = 1 + Greenfoot.getRandomNumber(3);
+            int alpha = 140 + Greenfoot.getRandomNumber(100);
+            background.setColor(new Color(255, 255, 255, alpha));
+            background.fillOval(x, y, size, size);
+        }
+
+        return background;
+    }
+
+    public static GreenfootImage createShipSprite(int size, Color body, Color accent, Color glow) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(new Color(0, 0, 0, 0));
+        image.clear();
+
+        int cx = size / 2;
+        int cy = size / 2;
+
+        image.setColor(glow);
+        image.fillOval(cx - size / 4, cy - size / 4, size / 2, size / 2);
+
+        image.setColor(body);
+        image.fillOval(cx - size / 5, cy - size / 3, size / 2, size * 2 / 3);
+        image.fillRect(cx - size / 8, cy - size / 2, size / 4, size * 2 / 3);
+
+        image.setColor(accent);
+        image.fillOval(cx - size / 10, cy - size / 6, size / 5, size / 3);
+        image.fillRect(cx - size / 18, cy - size / 2, size / 9, size / 2);
+
+        image.setColor(new Color(255, 255, 255, 120));
+        image.drawLine(cx, cy - size / 2 + 3, cx, cy + size / 3);
+
+        return image;
+    }
+
+    public static GreenfootImage createDroneSprite(int size, Color body, Color core, Color aura) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(new Color(0, 0, 0, 0));
+        image.clear();
+
+        image.setColor(aura);
+        image.fillOval(size / 6, size / 6, size * 2 / 3, size * 2 / 3);
+        image.setColor(body);
+        image.fillOval(size / 4, size / 4, size / 2, size / 2);
+        image.setColor(core);
+        image.fillOval(size / 2 - size / 8, size / 2 - size / 8, size / 4, size / 4);
+
+        image.setColor(new Color(255, 255, 255, 140));
+        image.drawLine(size / 2, 2, size / 2, size - 3);
+        image.drawLine(2, size / 2, size - 3, size / 2);
+
+        return image;
+    }
+
+    public static GreenfootImage createButtonPanel(String title, String subtitle, int width, int height, Color fill, Color border) {
+        GreenfootImage img = createBox(width, height, fill, border);
+        img.setColor(new Color(255, 255, 255, 35));
+        img.fillRect(4, 4, width - 8, height / 3);
+        GreenfootImage titleText = new GreenfootImage(title, Math.max(20, height / 4), new Color(255, 255, 255), new Color(0, 0, 0, 0));
+        GreenfootImage subtitleText = new GreenfootImage(subtitle, Math.max(14, height / 8), new Color(210, 220, 255), new Color(0, 0, 0, 0));
+        img.drawImage(titleText, Math.max(8, (width - titleText.getWidth()) / 2), Math.max(12, height / 3 - 8));
+        img.drawImage(subtitleText, Math.max(8, (width - subtitleText.getWidth()) / 2), Math.min(height - 28, height - 42));
+        return img;
+    }
+
+    public static GreenfootImage createDeckFloorTile(int size, int seedX, int seedY) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        int base = 18 + ((seedX * 13 + seedY * 17) % 10);
+        image.setColor(new Color(base, base + 4, base + 8));
+        image.fillRect(0, 0, size, size);
+
+        image.setColor(new Color(28, 34, 46));
+        image.drawRect(0, 0, size - 1, size - 1);
+        image.setColor(new Color(42, 50, 66));
+        image.drawLine(0, size / 2, size - 1, size / 2);
+        image.drawLine(size / 2, 0, size / 2, size - 1);
+
+        image.setColor(new Color(80, 120, 160, 80));
+        image.fillRect(size / 6, size / 6, size / 3, size / 8);
+        image.fillRect(size * 5 / 8, size * 5 / 8, size / 4, size / 8);
+
+        image.setColor(new Color(255, 255, 255, 28));
+        image.drawLine(2, 2, size - 3, 2);
+        image.drawLine(2, 2, 2, size - 3);
+        return image;
+    }
+
+    public static GreenfootImage createSpaceDeckBackground(int width, int height, int tileSize) {
+        GreenfootImage background = new GreenfootImage(width, height);
+        background.setColor(new Color(9, 12, 18));
+        background.fillRect(0, 0, width, height);
+
+        for (int y = 0; y < height; y += tileSize) {
+            for (int x = 0; x < width; x += tileSize) {
+                GreenfootImage tile = createDeckFloorTile(tileSize, x / tileSize, y / tileSize);
+                background.drawImage(tile, x, y);
+            }
+        }
+
+        background.setColor(new Color(255, 255, 255, 18));
+        for (int i = 0; i < 20; i++) {
+            int x = Greenfoot.getRandomNumber(width);
+            int y = Greenfoot.getRandomNumber(height);
+            background.fillOval(x, y, 2, 2);
+        }
+
+        return background;
+    }
+
+    public static GreenfootImage createWallSprite(int size, Color fill, Color border, Color highlight) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(fill);
+        image.fillRect(0, 0, size, size);
+
+        image.setColor(border);
+        image.drawRect(0, 0, size - 1, size - 1);
+        image.setColor(highlight);
+        image.fillRect(3, 3, size - 6, 4);
+        image.fillRect(3, size - 7, size - 6, 3);
+        image.drawLine(6, size / 2, size - 7, size / 2);
+
+        image.setColor(new Color(255, 255, 255, 50));
+        image.drawLine(1, 1, size - 2, 1);
+        image.drawLine(1, 1, 1, size - 2);
+        return image;
+    }
+
+    public static GreenfootImage createAlienEnemySprite(int size, boolean ranged) {
+        GreenfootImage image = new GreenfootImage(size, size);
+        image.setColor(new Color(0, 0, 0, 0));
+        image.clear();
+
+        if (ranged) {
+            image.setColor(new Color(175, 110, 255, 70));
+            image.fillOval(2, 2, size - 4, size - 4);
+            image.setColor(new Color(77, 37, 130));
+            image.fillOval(5, 5, size - 10, size - 10);
+            image.setColor(new Color(230, 200, 255));
+            image.fillOval(size / 2 - 4, size / 2 - 4, 8, 8);
+            image.setColor(new Color(255, 255, 255, 120));
+            image.drawLine(size / 2, 4, size / 2, size - 5);
+            image.drawLine(4, size / 2, size - 5, size / 2);
+            image.setColor(new Color(220, 180, 255));
+            image.drawLine(size / 2, 0, size / 2 - 7, 7);
+            image.drawLine(size / 2, 0, size / 2 + 7, 7);
+            image.drawLine(size / 2, size - 1, size / 2 - 7, size - 8);
+            image.drawLine(size / 2, size - 1, size / 2 + 7, size - 8);
+        } else {
+            image.setColor(new Color(255, 60, 90, 70));
+            image.fillOval(1, 1, size - 2, size - 2);
+            image.setColor(new Color(120, 18, 34));
+            image.fillOval(5, 5, size - 10, size - 10);
+            image.setColor(new Color(255, 185, 60));
+            image.fillOval(size / 2 - 5, size / 2 - 5, 10, 10);
+            image.setColor(new Color(255, 90, 120));
+            image.drawLine(size / 2, 2, size / 2 - 10, 10);
+            image.drawLine(size / 2, 2, size / 2 + 10, 10);
+            image.drawLine(size / 2, size - 3, size / 2 - 10, size - 12);
+            image.drawLine(size / 2, size - 3, size / 2 + 10, size - 12);
+        }
+
+        return image;
     }
 }

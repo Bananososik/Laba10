@@ -574,14 +574,25 @@ public class Player extends Actor {
     public void addXp(int amount) {
         xp += amount;
         if (xp >= xpToNext) {
-            xp -= xpToNext;
-            level++;
-            xpToNext = 10 + level * 5;
-            MyWorld w = (MyWorld) getWorld();
-            w.setPaused(true);
-            w.addObject(new LevelUpMenu(this), w.getWidth() / 2, w.getHeight() / 2);
+            do {
+                xp -= xpToNext;
+                level++;
+                xpToNext = 10 + level * 5;
+                autoApplyLevelUp();
+            } while (xp >= xpToNext);
         }
         ((MyWorld) getWorld()).notifyHit();
+    }
+
+    private void autoApplyLevelUp() {
+        List<UpgradeSystem.Def> choices = rollUpgradeChoices(3);
+        if (choices.isEmpty()) {
+            applyFallbackUpgrade();
+            return;
+        }
+
+        UpgradeSystem.Def picked = choices.get(Greenfoot.getRandomNumber(choices.size()));
+        applyUpgradeItem(picked.id);
     }
 
     public void takeDamage(int amount) {

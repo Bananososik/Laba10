@@ -1,7 +1,7 @@
 #BlueJ class context
 comment0.target=LUButton
-comment1.params=title\ description\ menu\ id
-comment1.target=LUButton(java.lang.String,\ java.lang.String,\ LevelUpMenu,\ java.lang.String)
+comment1.params=title\ description\ subtitle\ menu\ id
+comment1.target=LUButton(java.lang.String,\ java.lang.String,\ java.lang.String,\ LevelUpMenu,\ java.lang.String)
 comment2.params=
 comment2.target=void\ act()
 numComments=3

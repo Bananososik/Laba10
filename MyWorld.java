@@ -11,7 +11,8 @@ public class MyWorld extends World {
 
     public MyWorld() {
         super(GRID_W * TILE, GRID_H * TILE, 1);
-        setPaintOrder(Hud.class, LevelUpMenu.class, LUButton.class, Bullet.class, EnemyBullet.class, Enemy.class, Player.class, Wall.class);
+        setBackground(SpriteFactory.createSpaceDeckBackground(GRID_W * TILE, GRID_H * TILE, TILE));
+        setPaintOrder(Hud.class, Bullet.class, EnemyBullet.class, Enemy.class, Player.class, Wall.class);
         buildLevel();
         player = new Player();
         addObject(player, 2 * TILE + TILE / 2, 2 * TILE + TILE / 2);

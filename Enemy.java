@@ -15,11 +15,7 @@ public class Enemy extends Actor {
 
     public Enemy(boolean ranged) {
         this.ranged = ranged;
-        GreenfootImage placeholder = SpriteFactory.createCircle(32, new Color(210, 70, 70), new Color(100, 20, 20));
-        if (ranged) {
-            placeholder = SpriteFactory.createCircle(32, new Color(170, 110, 255), new Color(80, 30, 140));
-        }
-        setImage(placeholder);
+        setImage(SpriteFactory.createAlienEnemySprite(34, ranged));
         if (ranged) {
             hp = 2;
         }
@@ -108,10 +104,6 @@ public class Enemy extends Actor {
 
     public void takeDamage(int amount) {
         hp -= amount;
-        if (ranged) {
-            setImage(SpriteFactory.createCircle(32, new Color(170, 110, 255), new Color(80, 30, 140)));
-        } else {
-            setImage(SpriteFactory.createCircle(32, new Color(230, 100, 100), new Color(100, 20, 20)));
-        }
+        setImage(SpriteFactory.createAlienEnemySprite(34, ranged));
     }
 }

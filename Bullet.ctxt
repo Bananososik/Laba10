@@ -1,11 +1,13 @@
 #BlueJ class context
 comment0.target=Bullet
-comment1.params=vx\ vy\ life\ damage
-comment1.target=Bullet(double,\ double,\ int,\ int)
+comment1.params=vx\ vy\ life\ damage\ pierceLeft\ ricochetLeft\ homing
+comment1.target=Bullet(double,\ double,\ int,\ int,\ int,\ int,\ boolean)
 comment2.params=
 comment2.target=int\ getDamage()
 comment3.params=world
 comment3.target=void\ addedToWorld(greenfoot.World)
 comment4.params=
 comment4.target=void\ act()
-numComments=5
+comment5.params=
+comment5.target=void\ steerToNearestEnemy()
+numComments=6

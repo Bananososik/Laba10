@@ -9,13 +9,13 @@ public class LevelUpMenu extends Actor {
 
     public LevelUpMenu(Player p) {
         this.player = p;
-        GreenfootImage placeholder = SpriteFactory.createTextPanel(
-            "УРОВЕНЬ ПОВЫШЕН: ВЫБЕРИТЕ 1 ИЗ 3",
-            1020,
-            240,
-            new Color(20, 20, 30),
-            new Color(220, 220, 220),
-            new Color(255, 255, 255)
+        GreenfootImage placeholder = SpriteFactory.createButtonPanel(
+            "УРОВЕНЬ ПОВЫШЕН",
+            "выберите 1 из 3 улучшений",
+            1080,
+            320,
+            new Color(18, 18, 28, 235),
+            new Color(255, 220, 120)
         );
         setImage(placeholder);
         choices = player.rollUpgradeChoices(3);
@@ -30,11 +30,11 @@ public class LevelUpMenu extends Actor {
         int x = getX();
         int y = getY();
 
-        int[] xs = {x - 340, x, x + 340};
+        int[] xs = {x - 360, x, x + 360};
         for (int i = 0; i < choices.size() && i < 3; i++) {
             UpgradeSystem.Def def = choices.get(i);
             String subtitle = def.rarity.title + " • " + typeTitle(def.type);
-            wn.addObject(new LUButton(def.name, def.description, subtitle, this, def.id), xs[i], y + 18);
+            wn.addObject(new LUButton(def.name, def.description, subtitle, this, def.id), xs[i], y + 92);
         }
     }
 
