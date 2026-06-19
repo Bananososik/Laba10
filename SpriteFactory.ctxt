@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=SpriteFactory
+comment1.params=
+comment1.target=SpriteFactory()
+comment2.params=width\ height\ fill\ border
+comment2.target=greenfoot.GreenfootImage\ createBox(int,\ int,\ greenfoot.Color,\ greenfoot.Color)
+comment3.params=size\ fill\ border
+comment3.target=greenfoot.GreenfootImage\ createCircle(int,\ greenfoot.Color,\ greenfoot.Color)
+comment4.params=text\ width\ height\ fill\ border\ textColor
+comment4.target=greenfoot.GreenfootImage\ createTextPanel(java.lang.String,\ int,\ int,\ greenfoot.Color,\ greenfoot.Color,\ greenfoot.Color)
+comment5.params=assetPath\ width\ height\ placeholder
+comment5.target=greenfoot.GreenfootImage\ loadOrPlaceholder(java.lang.String,\ int,\ int,\ greenfoot.GreenfootImage)
+comment6.params=assetPaths\ width\ height\ placeholder
+comment6.target=greenfoot.GreenfootImage\ loadAny(java.lang.String[],\ int,\ int,\ greenfoot.GreenfootImage)
+comment7.params=assetPath\ cols\ rows
+comment7.target=greenfoot.GreenfootImage[][]\ sliceGrid(java.lang.String,\ int,\ int)
+numComments=8

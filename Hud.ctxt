@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=Hud
+comment1.params=
+comment1.target=void\ act()
+comment2.params=
+comment2.target=void\ markDirty()
+comment3.params=target\ x\ y\ width\ height\ value\ maxValue\ fill\ bg
+comment3.target=void\ drawBar(greenfoot.GreenfootImage,\ int,\ int,\ int,\ int,\ int,\ int,\ greenfoot.Color,\ greenfoot.Color)
+numComments=4

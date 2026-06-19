@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Wall
+comment1.params=
+comment1.target=Wall()
+comment2.params=variant
+comment2.target=Wall(Wall.Variant)
+comment3.params=north\ east\ south\ west
+comment3.target=Wall.Variant\ chooseVariant(boolean,\ boolean,\ boolean,\ boolean)
+comment4.params=variant
+comment4.target=greenfoot.GreenfootImage\ loadVariant(Wall.Variant)
+numComments=5

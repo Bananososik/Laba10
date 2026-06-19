@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Enemy
+comment1.params=
+comment1.target=Enemy()
+comment2.params=ranged
+comment2.target=Enemy(boolean)
+comment3.params=
+comment3.target=void\ act()
+comment4.params=dx\ dy
+comment4.target=void\ move(int,\ int)
+comment5.params=amount
+comment5.target=void\ takeDamage(int)
+numComments=6

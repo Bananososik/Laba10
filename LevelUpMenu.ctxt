@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=LevelUpMenu
+comment1.params=p
+comment1.target=LevelUpMenu(Player)
+comment2.params=wn
+comment2.target=void\ addedToWorld(greenfoot.World)
+comment3.params=id
+comment3.target=void\ applyChoice(java.lang.String)
+numComments=4
