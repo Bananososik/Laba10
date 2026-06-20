@@ -171,24 +171,140 @@ public final class SpriteFactory {
 
     public static GreenfootImage createDeckFloorTile(int size, int seedX, int seedY) {
         GreenfootImage image = new GreenfootImage(size, size);
-        int base = 18 + ((seedX * 13 + seedY * 17) % 10);
-        image.setColor(new Color(base, base + 4, base + 8));
+        int h = (seedX * 928371 + seedY * 1237) & 0x7fffffff; // детерминированный «хэш» клетки
+        int base = 22 + (h % 8);
+        image.setColor(new Color(base, base + 5, base + 11));
         image.fillRect(0, 0, size, size);
 
-        image.setColor(new Color(28, 34, 46));
+        // швы панели обшивки
+        image.setColor(new Color(34, 40, 54));
         image.drawRect(0, 0, size - 1, size - 1);
-        image.setColor(new Color(42, 50, 66));
-        image.drawLine(0, size / 2, size - 1, size / 2);
-        image.drawLine(size / 2, 0, size / 2, size - 1);
+        image.setColor(new Color(16, 20, 28));
+        image.drawLine(0, 0, size - 1, 0);
+        image.drawLine(0, 0, 0, size - 1);
 
-        image.setColor(new Color(80, 120, 160, 80));
-        image.fillRect(size / 6, size / 6, size / 3, size / 8);
-        image.fillRect(size * 5 / 8, size * 5 / 8, size / 4, size / 8);
+        // заклёпки по углам
+        image.setColor(new Color(60, 70, 90));
+        image.fillOval(3, 3, 3, 3);
+        image.fillOval(size - 6, 3, 3, 3);
+        image.fillOval(3, size - 6, 3, 3);
+        image.fillOval(size - 6, size - 6, 3, 3);
 
-        image.setColor(new Color(255, 255, 255, 28));
-        image.drawLine(2, 2, size - 3, 2);
-        image.drawLine(2, 2, 2, size - 3);
+        // редкие палубные элементы — зависят от «хэша» клетки
+        int feature = h % 7;
+        if (feature == 0) {
+            // люк/гермодверь
+            image.setColor(new Color(46, 54, 70));
+            image.fillRect(size / 4, size / 4, size / 2, size / 2);
+            image.setColor(new Color(70, 82, 104));
+            image.drawRect(size / 4, size / 4, size / 2, size / 2);
+            image.drawLine(size / 2, size / 4, size / 2, size * 3 / 4);
+            image.setColor(new Color(90, 150, 200, 120));
+            image.fillOval(size / 2 - 3, size / 2 - 3, 6, 6);
+        } else if (feature == 1) {
+            // вентиляционная решётка
+            image.setColor(new Color(40, 48, 62));
+            image.fillRect(size / 5, size / 5, size * 3 / 5, size * 3 / 5);
+            image.setColor(new Color(20, 26, 36));
+            for (int i = 0; i < 4; i++) {
+                int yy = size / 5 + 2 + i * (size * 3 / 5) / 4;
+                image.drawLine(size / 5 + 1, yy, size / 5 + size * 3 / 5 - 1, yy);
+            }
+        } else if (feature == 2) {
+            // светящаяся энергетическая жила
+            image.setColor(new Color(60, 150, 210, 150));
+            image.fillRect(size / 2 - 1, 0, 3, size);
+            image.setColor(new Color(120, 210, 255, 110));
+            image.fillRect(size / 2, 0, 1, size);
+        } else if (feature == 3) {
+            // поперечная жила
+            image.setColor(new Color(60, 150, 210, 150));
+            image.fillRect(0, size / 2 - 1, size, 3);
+            image.setColor(new Color(120, 210, 255, 110));
+            image.fillRect(0, size / 2, size, 1);
+        } else if (feature == 4) {
+            // предупреждающая разметка (диагональные полосы)
+            image.setColor(new Color(200, 170, 60, 70));
+            for (int i = -size; i < size; i += 8) {
+                image.drawLine(i, size, i + size, 0);
+            }
+        }
+
+        // мягкий блик сверху-слева
+        image.setColor(new Color(255, 255, 255, 16));
+        image.drawLine(1, 1, size - 2, 1);
+        image.drawLine(1, 1, 1, size - 2);
         return image;
+    }
+
+    /**
+     * Стена в стиле обшивки космического корабля. Металлические панели,
+     * заклёпки, рёбра жёсткости и подсветка швов. Вариант влияет на акцент грани.
+     */
+    public static GreenfootImage createHullWall(int size, Wall.Variant variant, int seedX, int seedY) {
+        GreenfootImage img = new GreenfootImage(size, size);
+        int h = (seedX * 73856093 ^ seedY * 19349663) & 0x7fffffff;
+
+        // базовый металл
+        int b = 70 + (h % 12);
+        img.setColor(new Color(b, b + 6, b + 16));
+        img.fillRect(0, 0, size, size);
+
+        // вертикальный градиент-объём
+        img.setColor(new Color(255, 255, 255, 22));
+        img.fillRect(0, 0, size, size / 3);
+        img.setColor(new Color(0, 0, 0, 55));
+        img.fillRect(0, size * 2 / 3, size, size / 3);
+
+        // внутренняя панель с фаской
+        img.setColor(new Color(b + 14, b + 22, b + 34));
+        img.fillRect(4, 4, size - 8, size - 8);
+        img.setColor(new Color(255, 255, 255, 40));
+        img.drawLine(4, 4, size - 5, 4);
+        img.drawLine(4, 4, 4, size - 5);
+        img.setColor(new Color(0, 0, 0, 70));
+        img.drawLine(5, size - 5, size - 5, size - 5);
+        img.drawLine(size - 5, 5, size - 5, size - 5);
+
+        // заклёпки
+        img.setColor(new Color(35, 40, 52));
+        int r = Math.max(2, size / 16);
+        int[] px = {7, size - 7 - r, 7, size - 7 - r};
+        int[] py = {7, 7, size - 7 - r, size - 7 - r};
+        for (int i = 0; i < 4; i++) {
+            img.fillOval(px[i], py[i], r, r);
+            img.setColor(new Color(120, 130, 150, 120));
+            img.drawOval(px[i], py[i], r, r);
+            img.setColor(new Color(35, 40, 52));
+        }
+
+        // ребро жёсткости по центру
+        img.setColor(new Color(40, 46, 60));
+        img.fillRect(size / 2 - 1, 8, 3, size - 16);
+
+        // акцентная подсветка грани по варианту (внешний контур комнаты)
+        Color neon = new Color(70, 150, 220, 180);
+        img.setColor(neon);
+        switch (variant) {
+            case TOP: case TOP_LEFT: case TOP_RIGHT:
+                img.fillRect(2, 2, size - 4, 2);
+                break;
+            case BOTTOM: case BOTTOM_LEFT: case BOTTOM_RIGHT:
+                img.fillRect(2, size - 4, size - 4, 2);
+                break;
+            case LEFT:
+                img.fillRect(2, 2, 2, size - 4);
+                break;
+            case RIGHT:
+                img.fillRect(size - 4, 2, 2, size - 4);
+                break;
+            default:
+                break;
+        }
+
+        img.setColor(new Color(12, 14, 20));
+        img.drawRect(0, 0, size - 1, size - 1);
+        return img;
     }
 
     public static GreenfootImage createSpaceDeckBackground(int width, int height, int tileSize) {
@@ -572,6 +688,11 @@ public final class SpriteFactory {
     }
 
     public static GreenfootImage createBossSprite(int size) {
+        return createBossSprite(size, "gunner");
+    }
+
+    /** Спрайт босса по типу (gunner/spinner/warlord). */
+    public static GreenfootImage createBossSprite(int size, String kind) {
         GreenfootImage image = new GreenfootImage(size, size);
         image.setColor(new Color(0, 0, 0, 0));
         image.clear();
@@ -579,38 +700,83 @@ public final class SpriteFactory {
         int cx = size / 2;
         int cy = size / 2;
 
-        // menacing outer glow
-        image.setColor(new Color(255, 70, 40, 60));
+        Color glowC, shellC, coreShellC, eyeC, accentC;
+        if ("spinner".equals(kind)) {
+            glowC = new Color(120, 80, 255, 70);
+            shellC = new Color(40, 28, 80);
+            coreShellC = new Color(80, 50, 150);
+            eyeC = new Color(190, 160, 255);
+            accentC = new Color(150, 110, 255);
+        } else if ("warlord".equals(kind)) {
+            glowC = new Color(255, 150, 40, 70);
+            shellC = new Color(70, 45, 16);
+            coreShellC = new Color(150, 95, 30);
+            eyeC = new Color(255, 220, 120);
+            accentC = new Color(255, 170, 60);
+        } else { // gunner
+            glowC = new Color(255, 70, 40, 70);
+            shellC = new Color(70, 20, 30);
+            coreShellC = new Color(140, 30, 40);
+            eyeC = new Color(255, 200, 120);
+            accentC = new Color(200, 60, 70);
+        }
+
+        // grozный внешний ореол
+        image.setColor(glowC);
         image.fillOval(0, 0, size, size);
-        // armored shell
-        image.setColor(new Color(70, 20, 30));
+        // броневой панцирь
+        image.setColor(shellC);
         image.fillOval(size / 10, size / 10, size - size / 5, size - size / 5);
-        image.setColor(new Color(140, 30, 40));
+        image.setColor(coreShellC);
         image.fillOval(size / 6, size / 6, size - size / 3, size - size / 3);
-        // plating ridges
-        image.setColor(new Color(40, 12, 18));
-        for (int i = 0; i < 8; i++) {
-            double a = Math.PI * 2 * i / 8.0;
+
+        // рёбра брони
+        image.setColor(new Color(0, 0, 0, 90));
+        int ridges = "spinner".equals(kind) ? 10 : 8;
+        for (int i = 0; i < ridges; i++) {
+            double a = Math.PI * 2 * i / ridges + ("spinner".equals(kind) ? 0.3 : 0.0);
             int x1 = (int) Math.round(cx + Math.cos(a) * size / 6.0);
             int y1 = (int) Math.round(cy + Math.sin(a) * size / 6.0);
             int x2 = (int) Math.round(cx + Math.cos(a) * size / 2.4);
             int y2 = (int) Math.round(cy + Math.sin(a) * size / 2.4);
             image.drawLine(x1, y1, x2, y2);
         }
-        // glowing core eye
-        image.setColor(new Color(255, 220, 120));
+
+        // светящееся ядро-глаз
+        image.setColor(eyeC);
         image.fillOval(cx - size / 8, cy - size / 8, size / 4, size / 4);
-        image.setColor(new Color(255, 255, 255, 200));
+        image.setColor(new Color(255, 255, 255, 210));
         image.fillOval(cx - size / 16, cy - size / 16, size / 8, size / 8);
-        // spikes
-        image.setColor(new Color(200, 60, 70));
-        for (int i = 0; i < 4; i++) {
-            double a = Math.PI / 4 + Math.PI / 2 * i;
-            int sx = (int) Math.round(cx + Math.cos(a) * size / 2.2);
-            int sy = (int) Math.round(cy + Math.sin(a) * size / 2.2);
-            int tx = (int) Math.round(cx + Math.cos(a) * size / 1.9);
-            int ty = (int) Math.round(cy + Math.sin(a) * size / 1.9);
-            image.drawLine(sx, sy, tx, ty);
+
+        // внешние акценты по типу
+        image.setColor(accentC);
+        if ("spinner".equals(kind)) {
+            // изогнутые лопасти-спирали
+            for (int i = 0; i < 4; i++) {
+                double a = Math.PI / 2 * i;
+                drawArcLines(image, cx, cy, size / 2 - 3, a, a + Math.toRadians(55));
+            }
+        } else if ("warlord".equals(kind)) {
+            // короны-рога
+            for (int i = 0; i < 6; i++) {
+                double a = Math.PI / 3 * i;
+                int sx = (int) Math.round(cx + Math.cos(a) * size / 2.3);
+                int sy = (int) Math.round(cy + Math.sin(a) * size / 2.3);
+                int tx = (int) Math.round(cx + Math.cos(a) * size / 1.85);
+                int ty = (int) Math.round(cy + Math.sin(a) * size / 1.85);
+                image.drawLine(sx, sy, tx, ty);
+                image.fillOval(tx - 2, ty - 2, 4, 4);
+            }
+        } else {
+            // gunner: 4 шипа-пушки
+            for (int i = 0; i < 4; i++) {
+                double a = Math.PI / 4 + Math.PI / 2 * i;
+                int sx = (int) Math.round(cx + Math.cos(a) * size / 2.2);
+                int sy = (int) Math.round(cy + Math.sin(a) * size / 2.2);
+                int tx = (int) Math.round(cx + Math.cos(a) * size / 1.9);
+                int ty = (int) Math.round(cy + Math.sin(a) * size / 1.9);
+                image.drawLine(sx, sy, tx, ty);
+            }
         }
         return image;
     }
@@ -657,6 +823,100 @@ public final class SpriteFactory {
             image.fillRect(cx - size / 4, cy - size / 12, size / 2, size / 6);
         }
         return image;
+    }
+
+    /** Спрайт врага по типу (chaser/ranger/fast/tank/bomber). */
+    public static GreenfootImage createEnemySprite(int size, String kind) {
+        GreenfootImage img = new GreenfootImage(size, size);
+        img.setColor(new Color(0, 0, 0, 0));
+        img.clear();
+        int cx = size / 2;
+        int cy = size / 2;
+
+        switch (kind) {
+            case "ranger": {
+                img.setColor(new Color(175, 110, 255, 70));
+                img.fillOval(2, 2, size - 4, size - 4);
+                img.setColor(new Color(77, 37, 130));
+                img.fillOval(5, 5, size - 10, size - 10);
+                img.setColor(new Color(230, 200, 255));
+                img.fillOval(cx - 4, cy - 4, 8, 8);
+                img.setColor(new Color(220, 180, 255));
+                img.drawLine(cx, 1, cx - 7, 8);
+                img.drawLine(cx, 1, cx + 7, 8);
+                img.drawLine(cx, size - 2, cx - 7, size - 9);
+                img.drawLine(cx, size - 2, cx + 7, size - 9);
+                break;
+            }
+            case "fast": {
+                // острый дротик-рой
+                img.setColor(new Color(120, 255, 200, 80));
+                img.fillOval(2, 2, size - 4, size - 4);
+                int[] xs = { cx, size - 3, cx, 3 };
+                int[] ys = { 3, cy, size - 3, cy };
+                img.setColor(new Color(30, 150, 110));
+                img.fillPolygon(xs, ys, 4);
+                img.setColor(new Color(150, 255, 220));
+                img.fillOval(cx - 3, cy - 3, 6, 6);
+                break;
+            }
+            case "tank": {
+                // бронированный шестиугольник
+                int r = size / 2 - 3;
+                int[] xs = new int[6];
+                int[] ys = new int[6];
+                for (int i = 0; i < 6; i++) {
+                    double a = Math.PI / 3 * i;
+                    xs[i] = (int) Math.round(cx + Math.cos(a) * r);
+                    ys[i] = (int) Math.round(cy + Math.sin(a) * r);
+                }
+                img.setColor(new Color(120, 130, 60, 80));
+                img.fillOval(0, 0, size, size);
+                img.setColor(new Color(90, 84, 40));
+                img.fillPolygon(xs, ys, 6);
+                img.setColor(new Color(160, 150, 70));
+                img.drawPolygon(xs, ys, 6);
+                img.setColor(new Color(255, 220, 120));
+                img.fillOval(cx - 5, cy - 5, 10, 10);
+                img.setColor(new Color(40, 36, 18));
+                img.drawOval(cx - 5, cy - 5, 10, 10);
+                break;
+            }
+            case "bomber": {
+                img.setColor(new Color(255, 120, 40, 90));
+                img.fillOval(0, 0, size, size);
+                img.setColor(new Color(150, 50, 20));
+                img.fillOval(4, 4, size - 8, size - 8);
+                // фитиль/детонатор
+                img.setColor(new Color(255, 200, 80));
+                img.fillOval(cx - 4, cy - 4, 8, 8);
+                img.setColor(new Color(255, 240, 180));
+                img.fillOval(cx - 2, cy - 2, 4, 4);
+                // шипы
+                img.setColor(new Color(255, 150, 70));
+                for (int i = 0; i < 6; i++) {
+                    double a = Math.PI / 3 * i;
+                    img.drawLine((int)(cx + Math.cos(a) * (size/2 - 6)), (int)(cy + Math.sin(a) * (size/2 - 6)),
+                                 (int)(cx + Math.cos(a) * (size/2 - 1)), (int)(cy + Math.sin(a) * (size/2 - 1)));
+                }
+                break;
+            }
+            default: { // chaser
+                img.setColor(new Color(255, 60, 90, 70));
+                img.fillOval(1, 1, size - 2, size - 2);
+                img.setColor(new Color(120, 18, 34));
+                img.fillOval(5, 5, size - 10, size - 10);
+                img.setColor(new Color(255, 185, 60));
+                img.fillOval(cx - 5, cy - 5, 10, 10);
+                img.setColor(new Color(255, 90, 120));
+                img.drawLine(cx, 2, cx - 10, 10);
+                img.drawLine(cx, 2, cx + 10, 10);
+                img.drawLine(cx, size - 3, cx - 10, size - 12);
+                img.drawLine(cx, size - 3, cx + 10, size - 12);
+                break;
+            }
+        }
+        return img;
     }
 
     public static GreenfootImage createAlienEnemySprite(int size, boolean ranged) {

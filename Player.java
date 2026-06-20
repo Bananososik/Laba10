@@ -13,14 +13,14 @@ public class Player extends Actor {
     private static final int MAX_ACTIVE_SLOTS = 6;
     private static final int MAX_PASSIVE_SLOTS = 6;
 
-    private int hp = 10;
-    private int maxHp = 10;
+    private int hp = 12;
+    private int maxHp = 12;
     private int damageCooldown = 0;
     private int facingX = 1;
     private int facingY = 0;
 
     private int fireCooldown = 0;
-    private int baseFireRate = 18;
+    private int baseFireRate = 16;
     private int shieldTicks = 0;
 
     private int xp = 0;
@@ -108,8 +108,12 @@ public class Player extends Actor {
         }
 
         if (hp <= 0) {
-            ((MyWorld) getWorld()).restartLevel();
+            ((MyWorld) getWorld()).onPlayerDied();
         }
+    }
+
+    public int getKillCount() {
+        return killCount;
     }
 
     private void handlePassiveEffects() {

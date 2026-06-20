@@ -12,11 +12,12 @@
 ## If there is time
 - [x] Dropable buffs
 - [x] One simple boss
+- [x] Несколько боссов (GUNNER / SPINNER / WARLORD) с разными паттернами
 - [ ] Sound effects
-- [ ] Better room variety
-- [x] Proper art replacement for the placeholders (корабль игрока, иконки баффов, эффекты атак/щита)
-- [ ] Enemy wave indicators and pacing
-- [x] Russian UI polish and spacing pass (меню level-up, HUD со шкалой щита)
+- [x] Better room variety (карта 48×30, переборки-отсеки, обшивка-стены, палубный декор)
+- [x] Proper art replacement for the placeholders (корабль игрока, иконки баффов, эффекты атак/щита, типы врагов/боссов)
+- [x] Enemy wave indicators and pacing (ramp: после 6 ур. врагов больше и спавн чаще, пачки)
+- [x] Russian UI polish and spacing pass (меню level-up, HUD-ячейки HP/щит/опыт без тёмного фона)
 
 ## Current plan
 - [x] Replace textures with placeholders
@@ -26,4 +27,6 @@
 - [x] Add chaser + ranged enemies
 - [x] Add pickups and one mini-boss
 - [x] Remove hub world, start menu goes straight to run
-- [ ] Tune balance
+- [x] Пять типов врагов (CHASER/RANGER/FAST/TANK/BOMBER) с масштабом от уровня
+- [x] Экран GAME OVER со статистикой (R — заново, M — меню)
+- [x] Tune balance (масштаб HP/урона врагов и боссов от уровня, стартовые статы игрока)

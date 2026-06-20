@@ -26,7 +26,11 @@ public class Wall extends Actor {
     }
 
     public Wall(Variant variant) {
-        setImage(loadVariant(variant));
+        this(variant, 0, 0);
+    }
+
+    public Wall(Variant variant, int seedX, int seedY) {
+        setImage(SpriteFactory.createHullWall(40, variant, seedX, seedY));
     }
 
     public static Variant chooseVariant(boolean north, boolean east, boolean south, boolean west) {
