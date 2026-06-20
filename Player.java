@@ -34,6 +34,8 @@ public class Player extends Actor {
     private int laserCooldown = 0;
     private int novaCooldown = 0;
     private double regenAccumulator = 0.0;
+    private int pendingLevelUps = 0;
+    private int rerollsPerLevel = 1;
 
     // Core stats
     private double damageMult = 1.0;
@@ -65,27 +67,12 @@ public class Player extends Actor {
     private final Set<String> passiveOwned = new HashSet<>();
     private final Set<String> specialOwned = new HashSet<>();
 
-    private enum State {
-        IDLE,
-        RUN,
-        SHOOT,
-        DEATH
-    }
-
-    private State state = State.IDLE;
-    private GreenfootImage[] runFrames = new GreenfootImage[4];
-    private GreenfootImage[] shootFrames = new GreenfootImage[4];
-    private GreenfootImage[] deathFrames = new GreenfootImage[7];
+    private static final int SHIP_SIZE = 48;
+    private double aimAngleDeg = 0.0;   // куда повёрнут корабль (носом)
+    private boolean thrusting = false;  // есть ли движение (для пламени)
 
     public Player() {
-        for (int i = 0; i < 4; i++) {
-            runFrames[i] = SpriteFactory.createCircle(42, new Color(80, 190, 120), new Color(20, 90, 50));
-            shootFrames[i] = SpriteFactory.createCircle(42, new Color(120, 220, 150), new Color(20, 90, 50));
-        }
-        for (int i = 0; i < 7; i++) {
-            deathFrames[i] = SpriteFactory.createCircle(42, new Color(120, 120, 120), new Color(40, 40, 40));
-        }
-        setImage(runFrames[0]);
+        setImage(SpriteFactory.createPlayerShip(SHIP_SIZE, 0, false, false, false));
     }
 
     public void act() {
@@ -159,6 +146,7 @@ public class Player extends Actor {
             facingX = dx;
             facingY = dy;
         }
+        thrusting = (dx != 0 || dy != 0);
 
         double speed = 2.0;
         double newPx = px + dx * speed;
@@ -213,6 +201,7 @@ public class Player extends Actor {
 
         double speed = 6.0 * bulletSpeedMult;
         double baseAngle = Math.atan2(dy, dx);
+        aimAngleDeg = Math.toDegrees(baseAngle); // корабль смотрит на цель при стрельбе
 
         int projectileCount = 1 + bonusProjectiles;
         if (hasChainBullets) {
@@ -224,26 +213,26 @@ public class Player extends Actor {
             double angle = baseAngle + angleOffset;
             int damage = rollDamage();
             int life = (int) Math.round(80 * rangeMult);
-            getWorld().addObject(
-                new Bullet(
-                    Math.cos(angle) * speed,
-                    Math.sin(angle) * speed,
-                    life,
-                    damage,
-                    pierceCount,
-                    ricochetCount,
-                    hasHoming || hasChainBullets
-                ),
-                sx,
-                sy
+            Bullet b = new Bullet(
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                life,
+                damage,
+                pierceCount,
+                ricochetCount,
+                hasHoming || hasChainBullets
             );
+            if (hasChainBullets) {
+                b.withKind("chain");
+            }
+            getWorld().addObject(b, sx, sy);
         }
 
         if (hasDrone) {
             double droneAngle = baseAngle + Math.PI / 2.0;
             int life = (int) Math.round(60 * rangeMult);
             getWorld().addObject(
-                new Bullet(Math.cos(droneAngle) * speed * 0.8, Math.sin(droneAngle) * speed * 0.8, life, rollDamage(), pierceCount, ricochetCount, hasHoming),
+                new Bullet(Math.cos(droneAngle) * speed * 0.8, Math.sin(droneAngle) * speed * 0.8, life, rollDamage(), pierceCount, ricochetCount, hasHoming).withKind("drone"),
                 sx,
                 sy
             );
@@ -252,7 +241,7 @@ public class Player extends Actor {
         if (hasLaser && laserCooldown <= 0) {
             int life = (int) Math.round(130 * rangeMult);
             getWorld().addObject(
-                new Bullet(Math.cos(baseAngle) * speed * 1.4, Math.sin(baseAngle) * speed * 1.4, life, (int) Math.round(rollDamage() * 2.4), pierceCount + 2, ricochetCount, hasHoming),
+                new Bullet(Math.cos(baseAngle) * speed * 1.4, Math.sin(baseAngle) * speed * 1.4, life, (int) Math.round(rollDamage() * 2.4), pierceCount + 2, ricochetCount, hasHoming).withKind("laser"),
                 sx,
                 sy
             );
@@ -264,7 +253,7 @@ public class Player extends Actor {
                 double a = Math.PI * 2 * i / 8.0;
                 int life = (int) Math.round(55 * rangeMult);
                 getWorld().addObject(
-                    new Bullet(Math.cos(a) * speed * 0.9, Math.sin(a) * speed * 0.9, life, rollDamage(), pierceCount, ricochetCount, hasHoming),
+                    new Bullet(Math.cos(a) * speed * 0.9, Math.sin(a) * speed * 0.9, life, rollDamage(), pierceCount, ricochetCount, hasHoming).withKind("nova"),
                     sx,
                     sy
                 );
@@ -312,32 +301,16 @@ public class Player extends Actor {
 
     private void animate() {
         animTick++;
-        if (hp <= 0) {
-            state = State.DEATH;
-        } else if (animTick - lastShotTick < 6) {
-            state = State.SHOOT;
-        } else if (Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d") || Greenfoot.isKeyDown("w") || Greenfoot.isKeyDown("s")
-            || Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("up") || Greenfoot.isKeyDown("down")) {
-            state = State.RUN;
-        } else {
-            state = State.IDLE;
+        boolean shooting = (animTick - lastShotTick) < 6;
+        int frame = (animTick / 5) % 4;
+
+        // если стоим на месте и не стреляли — корабль смотрит по направлению последнего движения
+        if (!thrusting && !shooting) {
+            aimAngleDeg = Math.toDegrees(Math.atan2(facingY, facingX));
         }
 
-        int frame = animTick / 6;
-        switch (state) {
-            case RUN:
-                setImage(runFrames[frame % runFrames.length]);
-                break;
-            case SHOOT:
-                setImage(shootFrames[frame % shootFrames.length]);
-                break;
-            case DEATH:
-                setImage(deathFrames[Math.min(frame, deathFrames.length - 1)]);
-                break;
-            default:
-                setImage(runFrames[0]);
-                break;
-        }
+        setImage(SpriteFactory.createPlayerShip(SHIP_SIZE, frame, thrusting, shooting, hasShield()));
+        setRotation((int) Math.round(aimAngleDeg));
     }
 
     public List<UpgradeSystem.Def> rollUpgradeChoices(int count) {
@@ -573,26 +546,56 @@ public class Player extends Actor {
 
     public void addXp(int amount) {
         xp += amount;
+        boolean leveled = false;
         if (xp >= xpToNext) {
             do {
                 xp -= xpToNext;
                 level++;
                 xpToNext = 10 + level * 5;
-                autoApplyLevelUp();
+                pendingLevelUps++;
+                leveled = true;
             } while (xp >= xpToNext);
+        }
+        if (leveled) {
+            openLevelUpMenuIfNeeded();
         }
         ((MyWorld) getWorld()).notifyHit();
     }
 
-    private void autoApplyLevelUp() {
-        List<UpgradeSystem.Def> choices = rollUpgradeChoices(3);
-        if (choices.isEmpty()) {
-            applyFallbackUpgrade();
+    /** Открывает меню выбора улучшения и ставит игру на паузу, если меню ещё не открыто. */
+    private void openLevelUpMenuIfNeeded() {
+        MyWorld w = (MyWorld) getWorld();
+        if (w == null || pendingLevelUps <= 0) {
             return;
         }
+        if (!w.getObjects(LevelUpMenu.class).isEmpty()) {
+            return; // меню уже на экране — оставшиеся уровни обработаются по очереди
+        }
+        w.setPaused(true);
+        w.addObject(new LevelUpMenu(this), w.getWidth() / 2, w.getHeight() / 2);
+    }
 
-        UpgradeSystem.Def picked = choices.get(Greenfoot.getRandomNumber(choices.size()));
-        applyUpgradeItem(picked.id);
+    /** Вызывается меню после выбора/пропуска: уменьшает очередь и открывает следующее меню при необходимости. */
+    public void onLevelUpResolved() {
+        if (pendingLevelUps > 0) {
+            pendingLevelUps--;
+        }
+        if (pendingLevelUps > 0) {
+            openLevelUpMenuIfNeeded();
+        } else {
+            MyWorld w = (MyWorld) getWorld();
+            if (w != null) {
+                w.setPaused(false);
+            }
+        }
+    }
+
+    public int getPendingLevelUps() {
+        return pendingLevelUps;
+    }
+
+    public int getRerollsPerLevel() {
+        return rerollsPerLevel;
     }
 
     public void takeDamage(int amount) {
@@ -635,6 +638,15 @@ public class Player extends Actor {
         return shieldTicks > 0;
     }
 
+    public int getShieldTicks() {
+        return shieldTicks;
+    }
+
+    /** Опорное значение для шкалы щита в HUD (макс. длительность одного щита). */
+    public int getShieldMaxTicks() {
+        return 300;
+    }
+
     public void heal(int amount) {
         if (amount <= 0) {
             return;
@@ -672,5 +684,14 @@ public class Player extends Actor {
         maxHp += 1;
         hp += 1;
         ((MyWorld) getWorld()).notifyHit();
+    }
+
+    /** Награда за пропуск выбора (ТЗ, раздел 6): немного опыта и лечение. */
+    public void applySkipReward() {
+        xp += Math.max(1, xpToNext / 5);
+        hp = Math.min(maxHp, hp + 1);
+        if (getWorld() != null) {
+            ((MyWorld) getWorld()).notifyHit();
+        }
     }
 }

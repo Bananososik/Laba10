@@ -23,8 +23,6 @@ public class MenuButton extends Actor {
         if (Greenfoot.mouseClicked(this)) {
             if (getWorld() instanceof MainMenuWorld) {
                 ((MainMenuWorld) getWorld()).handleAction(action);
-            } else if (getWorld() instanceof HubWorld) {
-                ((HubWorld) getWorld()).handleAction(action);
             }
         }
     }

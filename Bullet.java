@@ -21,7 +21,17 @@ public class Bullet extends Actor {
         this.pierceLeft = Math.max(0, pierceLeft);
         this.ricochetLeft = Math.max(0, ricochetLeft);
         this.homing = homing;
-        setImage(SpriteFactory.createCircle(10, new Color(255, 220, 80), new Color(120, 80, 0)));
+        setImage(SpriteFactory.createBulletSprite("normal"));
+    }
+
+    /** Перекрашивает пулю под тип оружия (laser/nova/drone/chain) — визуальный эффект по ТЗ. */
+    public Bullet withKind(String kind) {
+        setImage(SpriteFactory.createBulletSprite(kind));
+        if ("laser".equals(kind)) {
+            // вытянутый луч поворачиваем по направлению полёта
+            setRotation((int) Math.round(Math.toDegrees(Math.atan2(vy, vx))));
+        }
+        return this;
     }
 
     public int getDamage() {
